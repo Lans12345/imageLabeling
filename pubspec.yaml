@@ -37,6 +37,8 @@ dependencies:
   image_picker:
   tflite:
   meta:
+  camera:
+  text_to_speech:
 
 dev_dependencies:
   flutter_test:
