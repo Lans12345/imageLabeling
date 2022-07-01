@@ -68,7 +68,7 @@ class _HomeState extends State<Home> {
 
   loadCamera() async {
     cameraController = CameraController(
-      camera![0],
+      camera![1],
       ResolutionPreset.low,
     );
     cameraController!.initialize().then((value) {
@@ -132,41 +132,113 @@ class _HomeState extends State<Home> {
     cameraController!.dispose();
   }
 
+  late String text = 'No Result';
+  late String num = '0';
+
   TextToSpeech tts = TextToSpeech();
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(
-          title: const Text('Home'),
-          centerTitle: true,
+        body: Stack(
+      children: [
+        SizedBox(
+          child: !cameraController!.value.isInitialized
+              ? Container()
+              : SizedBox(
+                  height: double.infinity,
+                  child: CameraPreview(cameraController!),
+                ),
         ),
-        body: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            Expanded(
-              child: SizedBox(
-                child: !cameraController!.value.isInitialized
-                    ? Container()
-                    : AspectRatio(
-                        aspectRatio: cameraController!.value.aspectRatio,
-                        child: CameraPreview(cameraController!),
+        Center(
+          child: Column(
+            children: [
+              Padding(
+                padding: const EdgeInsets.fromLTRB(40, 45, 40, 12),
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(5),
+                  ),
+                  height: 60,
+                  width: double.infinity,
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Text(
+                        'Result: ' + text,
+                        style: const TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 18.0,
+                            color: Colors.black),
                       ),
-              ),
-            ),
-            Text('Result: ' + output),
-            Text('Accuracy: ' + accuracy),
-            RaisedButton(
-              onPressed: () {
-                double volume = 1.0;
-                tts.setVolume(volume);
+                      const SizedBox(
+                        height: 5,
+                      ),
+                      Text(
+                        'Accuracy: ' + num,
+                        style: const TextStyle(
+                            fontWeight: FontWeight.w200,
+                            fontSize: 14.0,
+                            color: Colors.black),
+                      )
+                    ],
+                  ),
+                ),
+              )
+            ],
+          ),
+        ),
+        Center(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              Padding(
+                padding: const EdgeInsets.fromLTRB(50, 0, 50, 12),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(5),
+                  child: RaisedButton(
+                    onPressed: () {
+                      double volume = 1.0;
+                      tts.setVolume(volume);
 
-                tts.speak(output);
-              },
-              child: const Text('Press'),
-            ),
-          ],
-        ));
+                      tts.speak(output);
+                      setState(() {
+                        num = accuracy;
+                        text = output;
+                      });
+                    },
+                    child: Padding(
+                      padding: const EdgeInsets.only(top: 10, bottom: 10),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: const [
+                          Icon(
+                            Icons.qr_code_scanner_rounded,
+                            size: 32,
+                          ),
+                          SizedBox(
+                            width: 10,
+                          ),
+                          Text(
+                            'Identify',
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 22,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
+    ));
   }
 }
