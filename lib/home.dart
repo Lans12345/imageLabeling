@@ -68,7 +68,7 @@ class _HomeState extends State<Home> {
 
   loadCamera() async {
     cameraController = CameraController(
-      camera![1],
+      camera![0],
       ResolutionPreset.low,
     );
     cameraController!.initialize().then((value) {
